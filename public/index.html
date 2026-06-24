@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veille Créneau — Alertes RDV sur ClicRDV</title>
+  <meta name="description" content="On surveille les créneaux ClicRDV à votre place et on vous alerte dès qu'une place se libère.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark">VC</span>
+        <span>
+          Veille Créneau
+          <small>Alertes RDV ClicRDV</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="#cabinets">Cabinets</a>
+        <a href="#tarif">Tarif</a>
+        <a href="#demande">Demander un cabinet</a>
+        <a class="button button-primary" href="/dashboard.html">Mon tableau de bord</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Les créneaux partent vite.<br>Vous, vous dormez.</h1>
+        <p class="lead">
+          On surveille les agendas ClicRDV à votre place et on vous envoie une alerte
+          dès qu'une place se libère. Pas de garantie de réservation — le créneau
+          reste une course — mais plus besoin de rafraîchir la page toutes les 15 minutes.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#cabinets">Voir les cabinets surveillés</a>
+          <a class="button button-ghost" href="/dashboard.html">Ouvrir le dashboard</a>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Scan automatique</span>
+          <span class="pill">Alerte push ntfy</span>
+          <span class="pill">Sans abonnement mensuel</span>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <h2>Comment ça marche</h2>
+        <p class="empty">Trois étapes, sans prise de tête.</p>
+        <div class="stat-grid">
+          <div class="stat">
+            <div class="label">Étape 1</div>
+            <div class="value" style="font-size:1rem;">Choisir</div>
+          </div>
+          <div class="stat">
+            <div class="label">Étape 2</div>
+            <div class="value" style="font-size:1rem;">Veille</div>
+          </div>
+          <div class="stat">
+            <div class="label">Étape 3</div>
+            <div class="value" style="font-size:1rem;">Alerte</div>
+          </div>
+          <div class="stat">
+            <div class="label">Prix</div>
+            <div class="value">2,99 €</div>
+          </div>
+        </div>
+        <p class="empty" style="margin-top:16px;">
+          Vous recevez une notification, vous réservez sur ClicRDV. Simple.
+        </p>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="steps">
+        <article class="step">
+          <div class="step-num">1</div>
+          <h3>Choisissez un cabinet</h3>
+          <p>Par spécialité, ville ou motif de consultation. Le catalogue grandit au fil du scraping et des demandes.</p>
+        </article>
+        <article class="step">
+          <div class="step-num">2</div>
+          <h3>On surveille pour vous</h3>
+          <p>Le serveur scanne l'API ClicRDV régulièrement et détecte les nouveaux créneaux libres.</p>
+        </article>
+        <article class="step">
+          <div class="step-num">3</div>
+          <h3>Vous êtes prévenue</h3>
+          <p>Notification instantanée sur votre téléphone. À vous d'être la plus rapide pour réserver.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="cabinets">
+      <div class="section-head">
+        <div>
+          <h2>Cabinets disponibles</h2>
+          <p>Indexés automatiquement ou ajoutés sur demande.</p>
+        </div>
+      </div>
+      <div class="catalog-grid" id="catalog-grid">
+        <p class="empty">Chargement du catalogue…</p>
+      </div>
+    </section>
+
+    <section class="section" id="tarif">
+      <div class="catalog-grid">
+        <article class="card price-card">
+          <div class="tag" style="background:rgba(255,255,255,0.12);color:white;">Offre de lancement</div>
+          <h2>Forfait veille</h2>
+          <div class="amount">2,99 €</div>
+          <p>Pas d'abonnement. Pas de mauvaise surprise si ça ne marche pas.</p>
+          <ul>
+            <li>2 alertes incluses</li>
+            <li>Votre tableau de bord perso</li>
+            <li>Surveillance jusqu'à 90 jours</li>
+            <li>Paiement à venir — pour l'instant en test</li>
+          </ul>
+        </article>
+        <article class="card" style="padding:24px;">
+          <h3>Ce qu'on promet (et ce qu'on ne promet pas)</h3>
+          <div class="notice notice-ok" style="margin-top:14px;">
+            On vous prévient quand un créneau apparaît — comme si vous regardiez la page en continu.
+          </div>
+          <div class="notice notice-warn" style="margin-top:10px;">
+            On ne réserve pas à votre place. Si 20 personnes sont alertées, il n'y a souvent qu'une place.
+          </div>
+          <div class="notice notice-muted" style="margin-top:10px;">
+            Service indépendant — non affilié à ClicRDV ni aux cabinets listés.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="demande">
+      <div class="section-head">
+        <div>
+          <h2>Demander un nouveau cabinet</h2>
+          <p>Vous ne trouvez pas le vôtre ? Décrivez-le, on l'ajoute manuellement.</p>
+        </div>
+      </div>
+      <article class="card" style="padding:24px;">
+        <form class="request-form" id="request-form">
+          <div class="form-grid">
+            <label>
+              Nom du cabinet ou du praticien
+              <input name="cabinet_name" required placeholder="Ex. Cabinet du Dr Martin">
+            </label>
+            <label>
+              Ville
+              <input name="city" required placeholder="Ex. Nantes">
+            </label>
+          </div>
+          <div class="form-grid">
+            <label>
+              Motif de consultation
+              <input name="motif" required placeholder="Ex. grains de beauté, bilan orthophonique…">
+            </label>
+            <label>
+              Département
+              <input name="department" pattern="[0-9]{2,3}" placeholder="Ex. 44">
+            </label>
+          </div>
+          <label>
+            Infos utiles (optionnel)
+            <textarea name="details" placeholder="Spécialité, urgence, ce que vous avez déjà essayé…"></textarea>
+          </label>
+          <label>
+            Email (optionnel, pour vous recontacter)
+            <input type="email" name="email" placeholder="vous@exemple.fr">
+          </label>
+          <div class="hero-actions">
+            <button type="submit">Envoyer la demande</button>
+          </div>
+          <p class="empty" id="request-message"></p>
+        </form>
+      </article>
+    </section>
+
+    <footer class="site-footer">
+      Veille Créneau — outil de surveillance de disponibilités publiques ClicRDV.
+      Ne remplace pas un avis médical ni une plateforme officielle de prise de rendez-vous.
+    </footer>
+  </div>
+
+  <script src="/js/landing.js" type="module"></script>
+</body>
+</html>

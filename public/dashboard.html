@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — Veille Créneau</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="dashboard-body">
+  <div class="container">
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark">VC</span>
+        <span>
+          Tableau de bord
+          <small id="subtitle">Chargement…</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/">Accueil</a>
+        <a class="btn secondary" id="booking-link" href="#" target="_blank" rel="noopener">Ouvrir ClicRDV</a>
+      </nav>
+    </header>
+
+    <div class="notice notice-ok" id="success-banner" hidden>
+      Des alertes ont été envoyées récemment — la surveillance fonctionne.
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <div class="label">Dernier check</div>
+        <div class="value" id="last-check">—</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="label">Créneaux trouvés</div>
+        <div class="value" id="slot-count">—</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="label">Prochain check auto</div>
+        <div class="value" id="next-check" style="font-size:1.1rem;">—</div>
+      </div>
+      <div class="dashboard-card">
+        <div class="label">Notifications ntfy</div>
+        <div class="value" id="ntfy-status" style="font-size:1.1rem;">—</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="check-now">Vérifier maintenant</button>
+      <button class="secondary" id="run-diagnostic">Test diagnostic API</button>
+      <button class="secondary" id="test-ntfy">Tester notification</button>
+    </div>
+    <p class="message" id="message"></p>
+
+    <article class="dashboard-card" id="diagnostic-card" hidden style="margin-bottom:16px;">
+      <h3 style="margin:0 0 8px;font-family:var(--font-display);">Diagnostic API</h3>
+      <p class="empty" id="diagnostic-summary"></p>
+      <div id="diagnostic-details"></div>
+    </article>
+
+    <article class="dashboard-card" style="margin-bottom:16px;">
+      <h3 style="margin:0 0 12px;font-family:var(--font-display);">Créneaux actuels</h3>
+      <div class="slots-list" id="current-slots">
+        <p class="empty">Aucun créneau pour l'instant.</p>
+      </div>
+    </article>
+
+    <article class="dashboard-card">
+      <h3 style="margin:0 0 12px;font-family:var(--font-display);">Historique des vérifications</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Créneaux</th>
+              <th>Notif</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <script src="/js/dashboard.js" type="module"></script>
+</body>
+</html>
