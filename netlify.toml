@@ -1,0 +1,11 @@
+# Doctovite / Veille Créneau — site statique (cocon)
+#
+# Variables d'environnement à configurer dans Netlify UI → Site → Environment variables :
+#   SUPABASE_URL         = https://xxx.supabase.co
+#   SUPABASE_ANON_KEY    = clé publishable / anon (jamais la service_role)
+#
+# Après ajout ou modification des variables : redéployer pour régénérer public/js/supabase-config.js
+
+[build]
+  publish = "public"
+  command = "node scripts/build-config.js"

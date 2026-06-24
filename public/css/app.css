@@ -131,19 +131,45 @@ button:hover,
   transform: translateY(-1px);
 }
 
+.button:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.nav a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .button-primary,
-button:not(.secondary):not(.ghost) {
+button.button-primary {
   background: var(--brand);
-  color: white;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 92, 85, 0.18);
+}
+
+button:not(.secondary):not(.ghost):not(.button-secondary):not(.button-nav-cta) {
+  background: var(--brand);
+  color: #ffffff;
   box-shadow: 0 10px 24px rgba(15, 92, 85, 0.18);
 }
 
 .button-secondary,
 button.secondary,
+button.button-secondary,
 .btn.secondary {
-  background: white;
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--brand);
+  border: 2px solid var(--brand);
+}
+
+.button-nav-cta {
+  background: #ffffff;
+  color: var(--brand);
+  border: 2px solid var(--brand);
+  box-shadow: 0 4px 14px rgba(15, 92, 85, 0.12);
+}
+
+.button-nav-cta:hover {
+  background: var(--brand-soft);
 }
 
 .button-ghost,
@@ -352,6 +378,12 @@ button:disabled {
   color: white;
 }
 
+.price-card .tag-launch {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
 .price-card .amount {
   font-family: var(--font-display);
   font-size: 3rem;
@@ -425,22 +457,135 @@ button:disabled {
   font-size: 0.92rem;
 }
 
-.dashboard-body {
-  color-scheme: dark;
-  --bg: #0d1210;
-  --bg-elevated: #151d1a;
-  --ink: #edf3f0;
-  --ink-muted: #9fb0a9;
-  --line: #27332f;
-  --brand: #49b6a8;
-  --brand-soft: #173531;
-  --accent: #f08f70;
-  --ok: #57d39a;
-  --warn: #f0c35c;
-  --err: #ff8f86;
+.dashboard-body,
+.cocon-body {
+  color-scheme: light;
   background:
-    radial-gradient(circle at top right, rgba(73, 182, 168, 0.12), transparent 24%),
-    linear-gradient(180deg, #0b100e, #101614);
+    radial-gradient(circle at top left, rgba(196, 92, 62, 0.07), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(15, 92, 85, 0.08), transparent 28%),
+    linear-gradient(180deg, #fffaf6 0%, var(--bg) 100%);
+}
+
+.cocon-welcome {
+  padding: 8px 0 28px;
+}
+
+.cocon-eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cocon-greeting {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.cocon-lead {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 1.08rem;
+  max-width: 52ch;
+}
+
+.cocon-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 20px;
+}
+
+.cocon-card {
+  padding: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.cocon-card-highlight {
+  background: linear-gradient(160deg, #ffffff 0%, var(--brand-soft) 100%);
+  border-color: rgba(15, 92, 85, 0.15);
+}
+
+.cocon-label {
+  color: var(--ink-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cocon-value {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-top: 8px;
+  line-height: 1.2;
+}
+
+.cocon-value-sm {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.cocon-hint {
+  margin: 10px 0 0;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+.cocon-panel {
+  padding: 22px;
+  margin-bottom: 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.cocon-panel h2,
+.cocon-panel h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.cocon-panel-intro {
+  margin: 0 0 16px;
+  color: var(--ink-muted);
+}
+
+.cocon-panel-nested {
+  margin-top: 16px;
+  box-shadow: none;
+}
+
+.cocon-advanced {
+  margin: 8px 0 40px;
+  padding: 18px 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.cocon-advanced summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.cocon-advanced[open] summary {
+  margin-bottom: 14px;
+}
+
+.slot-item-highlight {
+  background: var(--ok-soft);
+  border-color: rgba(31, 122, 83, 0.2);
 }
 
 .dashboard-grid {
@@ -495,7 +640,7 @@ button:disabled {
   padding: 14px 16px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  background: #ffffff;
 }
 
 table {

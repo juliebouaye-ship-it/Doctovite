@@ -3,88 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tableau de bord — Veille Créneau</title>
+  <title>Mon espace — Doctovite</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/app.css">
 </head>
-<body class="dashboard-body">
+<body class="cocon-body">
   <div class="container">
     <header class="site-header">
       <a class="brand" href="/">
-        <span class="brand-mark">VC</span>
+        <span class="brand-mark">DV</span>
         <span>
-          Tableau de bord
-          <small id="subtitle">Chargement…</small>
+          Doctovite
+          <small>Mon espace</small>
         </span>
       </a>
       <nav class="nav">
         <a href="/">Accueil</a>
-        <a class="btn secondary" id="booking-link" href="#" target="_blank" rel="noopener">Ouvrir ClicRDV</a>
+        <a class="button button-secondary" id="booking-link" href="#" target="_blank" rel="noopener">Réserver sur ClicRDV</a>
       </nav>
     </header>
 
+    <section class="cocon-welcome">
+      <p class="cocon-eyebrow">Votre cocon de veille</p>
+      <h1 class="cocon-greeting" id="greeting">Bonjour</h1>
+      <p class="cocon-lead" id="watch-summary">Chargement de votre espace…</p>
+    </section>
+
     <div class="notice notice-ok" id="success-banner" hidden>
-      Des alertes ont été envoyées récemment — la surveillance fonctionne.
+      Une alerte vous a été envoyée récemment — pensez à regarder votre téléphone.
+    </div>
+    <div class="notice notice-warn" id="inactive-banner" hidden></div>
+
+    <div class="cocon-grid">
+      <article class="cocon-card cocon-card-highlight">
+        <div class="cocon-label">État de la veille</div>
+        <div class="cocon-value" id="watch-status">—</div>
+        <p class="cocon-hint" id="watch-hint"></p>
+      </article>
+      <article class="cocon-card">
+        <div class="cocon-label">Dernière vérification</div>
+        <div class="cocon-value cocon-value-sm" id="last-check">—</div>
+      </article>
+      <article class="cocon-card">
+        <div class="cocon-label">Places libres repérées</div>
+        <div class="cocon-value" id="slot-count">—</div>
+      </article>
+      <article class="cocon-card">
+        <div class="cocon-label">Type de notification</div>
+        <div class="cocon-value cocon-value-sm" id="notify-type">—</div>
+      </article>
     </div>
 
-    <div class="dashboard-grid">
-      <div class="dashboard-card">
-        <div class="label">Dernier check</div>
-        <div class="value" id="last-check">—</div>
-      </div>
-      <div class="dashboard-card">
-        <div class="label">Créneaux trouvés</div>
-        <div class="value" id="slot-count">—</div>
-      </div>
-      <div class="dashboard-card">
-        <div class="label">Prochain check auto</div>
-        <div class="value" id="next-check" style="font-size:1.1rem;">—</div>
-      </div>
-      <div class="dashboard-card">
-        <div class="label">Notifications ntfy</div>
-        <div class="value" id="ntfy-status" style="font-size:1.1rem;">—</div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button id="check-now">Vérifier maintenant</button>
-      <button class="secondary" id="run-diagnostic">Test diagnostic API</button>
-      <button class="secondary" id="test-ntfy">Tester notification</button>
-    </div>
-    <p class="message" id="message"></p>
-
-    <article class="dashboard-card" id="diagnostic-card" hidden style="margin-bottom:16px;">
-      <h3 style="margin:0 0 8px;font-family:var(--font-display);">Diagnostic API</h3>
-      <p class="empty" id="diagnostic-summary"></p>
-      <div id="diagnostic-details"></div>
-    </article>
-
-    <article class="dashboard-card" style="margin-bottom:16px;">
-      <h3 style="margin:0 0 12px;font-family:var(--font-display);">Créneaux actuels</h3>
+    <article class="cocon-panel">
+      <h2>Créneaux repérés</h2>
+      <p class="cocon-panel-intro">Les dernières places libres détectées pour votre motif.</p>
       <div class="slots-list" id="current-slots">
-        <p class="empty">Aucun créneau pour l'instant.</p>
+        <p class="empty">Aucune place libre pour l'instant — on continue de surveiller pour vous.</p>
       </div>
     </article>
 
-    <article class="dashboard-card">
-      <h3 style="margin:0 0 12px;font-family:var(--font-display);">Historique des vérifications</h3>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Créneaux</th>
-              <th>Notif</th>
-              <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody id="history-body"></tbody>
-        </table>
-      </div>
+    <article class="cocon-panel" id="last-alert-panel" hidden>
+      <h2>Dernière alerte</h2>
+      <p class="empty" id="last-alert-text"></p>
     </article>
+
+    <details class="cocon-advanced">
+      <summary>Réglages techniques</summary>
+      <p class="empty">Réservé aux tests et à la maintenance — vous n'en avez normalement pas besoin.</p>
+      <div class="actions">
+        <button class="button button-primary" id="check-now" type="button">Vérifier maintenant</button>
+        <button class="button button-secondary" id="test-ntfy" type="button">Tester une alerte</button>
+        <button class="button button-secondary" id="run-diagnostic" type="button">Diagnostic API</button>
+      </div>
+      <p class="message" id="message"></p>
+      <article class="cocon-panel cocon-panel-nested" id="diagnostic-card" hidden>
+        <h3>Diagnostic</h3>
+        <p class="empty" id="diagnostic-summary"></p>
+        <div id="diagnostic-details"></div>
+      </article>
+    </details>
   </div>
 
   <script src="/js/dashboard.js" type="module"></script>
