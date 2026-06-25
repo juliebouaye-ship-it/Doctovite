@@ -2,21 +2,24 @@
 
 ## Qu'est-ce que c'est ?
 
-**Veille Créneau** (nom provisoire) surveille les créneaux libres sur **ClicRDV** et envoie une **notification ntfy** quand de nouveaux créneaux apparaissent.
+**Doctovite** (ex. Veille Créneau) surveille les créneaux libres sur **ClicRDV** et envoie une **notification ntfy** quand de nouveaux créneaux apparaissent.
 
 ## Phases produit
 
-Voir [ROADMAP.md](./ROADMAP.md) pour le détail des **deux grandes étapes** :
+Voir [ROADMAP.md](./ROADMAP.md) pour le détail des **deux grandes étapes**.
 
-1. **Mon cocon** — espace perso permanent (Supabase + front hébergé), VPS cuisine à la demande seulement
-2. **Appli avec utilisateurs** — même architecture + multi-users, paiement, modèle économique à définir
+**État actuel (juin 2026)** :
+- Cocon sur **Netlify** + données **Supabase**
+- Worker **VPS OVH** → écrit les scans dans Supabase + alertes ntfy
+- Dashboard accessible **sans tunnel SSH**
+- Login / RLS : **pas encore** (cocon public si on a l'URL)
 
-État actuel (avant étape 1) :
+Cas d'usage initial :
 - **Cabinet** : Clinique dermatologique du Confluent (Nantes)
 - **Motif** : 1ère consultation pour examen des grains de beauté
 - **4 médecins** surveillés en parallèle
 - Les **premières alertes ont fonctionné** (juin 2026)
-- **App sur VPS** : tourne 24h/24, mais le dashboard n'est accessible que via **tunnel SSH** pour l'instant
+- **Pont Supabase** opérationnel (juin 2026)
 
 ## Positionnement
 

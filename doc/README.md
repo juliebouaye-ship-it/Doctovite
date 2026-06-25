@@ -11,6 +11,7 @@ Dossier de contexte pour les agents Cursor qui travaillent sur ce projet.
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Structure du code, routes API, front |
 | [API-CLICRDV.md](./API-CLICRDV.md) | API publique, indexation, scraping |
 | [ROADMAP.md](./ROADMAP.md) | **Deux grandes étapes** + backlog |
+| [VEILLE.md](./VEILLE.md) | Pause veille, VPS, login Supabase |
 
 ## Démarrage rapide (agent)
 
@@ -20,7 +21,8 @@ cd "c:\Users\JulieJeltsch\Documents\Résa"
 ```
 
 - Accueil : http://127.0.0.1:8080
-- Dashboard : http://127.0.0.1:8080/dashboard.html
+- Connexion : http://127.0.0.1:8080/login.html
+- Cocon : http://127.0.0.1:8080/dashboard.html (après login)
 
 Si `Cannot GET /dashboard.html` → **redémarrer le serveur** (`.\run.ps1` tue l'ancienne instance sur le port). Le fichier existe dans `public/dashboard.html` ; une instance Node lancée avant sa création ne le sert pas.
 
