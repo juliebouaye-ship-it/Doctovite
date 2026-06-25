@@ -32,11 +32,16 @@ function getActiveCabinet() {
   );
 }
 
-app.get("/api/status", (_req, res) => {
-  res.json({
-    ...buildStatus(),
-    cabinet: getActiveCabinet(),
-  });
+app.get("/api/status", async (_req, res) => {
+  try {
+    const status = await buildStatus();
+    res.json({
+      ...status,
+      cabinet: status.cabinet || getActiveCabinet(),
+    });
+  } catch (error) {
+    res.status(500).json({ detail: String(error) });
+  }
 });
 
 app.get("/api/catalog", (_req, res) => {

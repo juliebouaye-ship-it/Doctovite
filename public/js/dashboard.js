@@ -1,4 +1,15 @@
-// Cocon Doctovite — lecture via /api/* en local (worker VPS), état inactif sur Netlify.
+// Cocon Doctovite — lit l'état depuis Supabase (source unique VPS + Netlify).
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "/js/supabase-config.js";
+
+const supabase =
+  SUPABASE_URL && SUPABASE_ANON_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+const isLocalDev =
+  location.hostname === "127.0.0.1" || location.hostname === "localhost";
 
 function formatDate(iso) {
   if (!iso) return "—";
@@ -35,10 +46,15 @@ function renderStatus(data) {
     document.getElementById("booking-link").href = data.cabinet.booking_url;
   }
 
-  document.getElementById("watch-status").textContent = "Veille active";
-  document.getElementById("watch-status").className = "cocon-value value-ok";
-  document.getElementById("watch-hint").textContent =
-    `Vérification automatique toutes les ${data.check_interval_minutes} minutes`;
+  const isActive = data.watch_status !== "paused" && data.watch_status !== "completed";
+  document.getElementById("watch-status").textContent = isActive
+    ? "Veille active"
+    : "En pause";
+  document.getElementById("watch-status").className =
+    "cocon-value " + (isActive ? "value-ok" : "value-warn");
+  document.getElementById("watch-hint").textContent = isActive
+    ? `Vérification automatique toutes les ${data.check_interval_minutes} minutes`
+    : "Pas de surveillance en cours pour le moment.";
 
   const notifyEl = document.getElementById("notify-type");
   notifyEl.textContent = data.ntfy_configured
@@ -58,8 +74,7 @@ function renderStatus(data) {
   countEl.className = "cocon-value " + (count > 0 ? "value-ok" : "");
 
   const lastNotified = data.history?.find((item) => item.notified);
-  const successBanner = document.getElementById("success-banner");
-  successBanner.hidden = !lastNotified;
+  document.getElementById("success-banner").hidden = !lastNotified;
 
   const alertPanel = document.getElementById("last-alert-panel");
   if (lastNotified) {
@@ -88,33 +103,101 @@ function renderStatus(data) {
       .join("");
   }
 
-  document.getElementById("inactive-banner").hidden = true;
+  const inactive = document.getElementById("inactive-banner");
+  inactive.hidden = isActive;
+  if (!isActive) {
+    inactive.textContent =
+      "La veille est en pause. Votre historique reste ici ; les alertes reprendront quand la surveillance sera active.";
+  }
 }
 
-function showInactiveState() {
+function showEmptyCocon() {
   document.getElementById("watch-summary").textContent =
-    "Votre espace est prêt. La veille reprendra dès que la surveillance sera rallumée.";
+    "Votre espace est prêt. La veille n'est pas encore configurée dans Supabase.";
 
-  document.getElementById("watch-status").textContent = "En pause";
+  document.getElementById("watch-status").textContent = "En attente";
   document.getElementById("watch-status").className = "cocon-value value-warn";
   document.getElementById("watch-hint").textContent =
-    "Pas de surveillance en cours pour le moment.";
+    "Lancez la migration Supabase pour connecter le VPS à ce cocon.";
 
   document.getElementById("last-check").textContent = "—";
   document.getElementById("slot-count").textContent = "—";
   document.getElementById("notify-type").textContent = "—";
 
-  const inactive = document.getElementById("inactive-banner");
-  inactive.hidden = false;
-  inactive.textContent =
-    "La veille est en pause. Votre historique reste ici ; les alertes reprendront quand la surveillance sera active.";
+  document.getElementById("inactive-banner").hidden = false;
+  document.getElementById("inactive-banner").textContent =
+    "Pas encore de données Supabase. Le VPS et le cocon ne sont pas encore reliés.";
 
   document.getElementById("current-slots").innerHTML =
-    '<p class="empty">La surveillance n\'est pas active en ce moment.</p>';
+    '<p class="empty">Les vérifications apparaîtront ici une fois la connexion établie.</p>';
+}
 
-  document.getElementById("check-now").disabled = true;
-  document.getElementById("run-diagnostic").disabled = true;
-  document.getElementById("test-ntfy").disabled = true;
+async function loadFromSupabase() {
+  if (!supabase) return null;
+
+  const { data: watch, error: watchError } = await supabase
+    .from("watches")
+    .select("*, cabinets(*)")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (watchError) throw watchError;
+  if (!watch) return null;
+
+  const { data: checks, error: checksError } = await supabase
+    .from("checks")
+    .select("checked_at, slot_count, slots, notified, error")
+    .eq("watch_id", watch.id)
+    .order("checked_at", { ascending: false })
+    .limit(20);
+
+  if (checksError) throw checksError;
+
+  const latest = checks?.[0] || null;
+  return {
+    check_interval_minutes: watch.check_interval_minutes,
+    scan_days: watch.scan_days,
+    ntfy_configured: Boolean(watch.ntfy_topic),
+    watch_status: watch.status,
+    cabinet: watch.cabinets,
+    latest,
+    history: checks || [],
+  };
+}
+
+async function loadFromLocalApi() {
+  const response = await fetch("/api/status");
+  if (!response.ok) return null;
+  const data = await response.json();
+  return { ...data, watch_status: "active" };
+}
+
+async function refresh() {
+  try {
+    const fromSupabase = await loadFromSupabase();
+    if (fromSupabase) {
+      renderStatus(fromSupabase);
+      return;
+    }
+  } catch (error) {
+    console.error("[cocon] Supabase :", error);
+  }
+
+  if (isLocalDev) {
+    try {
+      const fromApi = await loadFromLocalApi();
+      if (fromApi) {
+        renderStatus(fromApi);
+        return;
+      }
+    } catch (error) {
+      console.error("[cocon] API locale :", error);
+    }
+  }
+
+  showEmptyCocon();
 }
 
 async function runAction(url, message) {
@@ -153,45 +236,43 @@ async function runDiagnostic() {
   messageEl.textContent = data.summary;
 }
 
-async function refresh() {
-  const response = await fetch("/api/status");
-  if (!response.ok) {
-    showInactiveState();
-    return;
-  }
-  renderStatus(await response.json());
+setGreeting();
+refresh();
+
+if (isLocalDev) {
+  document.getElementById("check-now").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await runAction("/api/check", "Vérification en cours (cela peut prendre une minute)…");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  document.getElementById("run-diagnostic").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await runDiagnostic();
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  document.getElementById("test-ntfy").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await runAction("/api/test-ntfy", "Envoi d'une notification test sur votre téléphone…");
+    } finally {
+      button.disabled = false;
+    }
+  });
+} else {
+  document.getElementById("check-now").disabled = true;
+  document.getElementById("run-diagnostic").disabled = true;
+  document.getElementById("test-ntfy").disabled = true;
 }
 
-setGreeting();
-
-document.getElementById("check-now").addEventListener("click", async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  try {
-    await runAction("/api/check", "Vérification en cours (cela peut prendre une minute)…");
-  } finally {
-    button.disabled = false;
-  }
-});
-
-document.getElementById("run-diagnostic").addEventListener("click", async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  try {
-    await runDiagnostic();
-  } finally {
-    button.disabled = false;
-  }
-});
-
-document.getElementById("test-ntfy").addEventListener("click", async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  try {
-    await runAction("/api/test-ntfy", "Envoi d'une notification test sur votre téléphone…");
-  } finally {
-    button.disabled = false;
-  }
-});
-
-refresh().catch(() => showInactiveState());
+setInterval(refresh, 60_000);

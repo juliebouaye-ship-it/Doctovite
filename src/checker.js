@@ -13,11 +13,23 @@ import {
   saveCheck,
   slotKey,
 } from "./storage.js";
+import {
+  buildStatusFromSupabase,
+  getActiveWatch,
+  getKnownSlotKeysForWatch,
+  rememberSlotsForWatch,
+  saveCheckForWatch,
+  supabaseEnabled,
+} from "./supabase-storage.js";
 
 export async function runCheck(sendNotification = true) {
+  const watch = supabaseEnabled() ? await getActiveWatch() : null;
+
   try {
     const slots = await fetchAllSlots();
-    const known = getKnownSlotKeys();
+    const known = watch
+      ? await getKnownSlotKeysForWatch(watch.id)
+      : getKnownSlotKeys();
     const newSlots = slots.filter((slot) => !known.has(slotKey(slot)));
 
     let notified = false;
@@ -27,10 +39,22 @@ export async function runCheck(sendNotification = true) {
     }
 
     if (slots.length > 0) {
-      rememberSlots(slots);
+      if (watch) {
+        await rememberSlotsForWatch(watch.id, slots);
+      } else {
+        rememberSlots(slots);
+      }
     }
 
-    const checkId = saveCheck(slots.length, slots, { notified });
+    let checkId;
+    if (watch) {
+      checkId = await saveCheckForWatch(watch.id, slots.length, slots, {
+        notified,
+      });
+    } else {
+      checkId = saveCheck(slots.length, slots, { notified });
+    }
+
     return {
       ok: true,
       check_id: checkId,
@@ -42,10 +66,17 @@ export async function runCheck(sendNotification = true) {
       formatted_slots: slots.map(formatSlot),
     };
   } catch (error) {
-    const checkId = saveCheck(0, [], { notified: false, error: String(error) });
+    if (watch) {
+      await saveCheckForWatch(watch.id, 0, [], {
+        notified: false,
+        error: String(error),
+      });
+    } else {
+      saveCheck(0, [], { notified: false, error: String(error) });
+    }
     return {
       ok: false,
-      check_id: checkId,
+      check_id: null,
       slot_count: 0,
       new_slot_count: 0,
       notified: false,
@@ -56,7 +87,12 @@ export async function runCheck(sendNotification = true) {
   }
 }
 
-export function buildStatus() {
+export async function buildStatus() {
+  if (supabaseEnabled()) {
+    const fromSupabase = await buildStatusFromSupabase();
+    if (fromSupabase) return fromSupabase;
+  }
+
   return {
     now: new Date().toISOString(),
     check_interval_minutes: CHECK_INTERVAL_MINUTES,

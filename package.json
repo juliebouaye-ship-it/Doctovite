@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node src/test-cli.js"
+    "test": "node src/test-cli.js",
+    "migrate:supabase": "node scripts/migrate-to-supabase.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "ws": "^8.18.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "node-cron": "^3.0.3"
