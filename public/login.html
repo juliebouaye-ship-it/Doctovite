@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — Doctovite</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="login-body">
+  <div class="login-shell">
+    <a class="brand login-brand" href="/">
+      <span class="brand-mark">DV</span>
+      <span>
+        Doctovite
+        <small>Votre cocon de veille</small>
+      </span>
+    </a>
+
+    <article class="login-card">
+      <p class="login-eyebrow">Espace personnel</p>
+      <h1 class="login-title">Contente de vous revoir</h1>
+      <p class="login-lead">
+        Entrez votre email — on vous envoie un lien magique pour accéder à votre espace.
+        Pas de mot de passe à retenir.
+      </p>
+
+      <form class="login-form" id="login-form">
+        <label class="login-label" for="email">Votre email</label>
+        <input
+          class="login-input"
+          id="email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="vous@exemple.fr"
+        >
+        <button class="button button-primary login-submit" type="submit" id="submit-btn">
+          Recevoir mon lien de connexion
+        </button>
+      </form>
+
+      <p class="login-message" id="login-message" hidden></p>
+
+      <div class="login-success" id="login-success" hidden>
+        <div class="login-success-icon" aria-hidden="true">✓</div>
+        <h2 class="login-success-title">C'est parti !</h2>
+        <p class="login-success-text">
+          Un lien vient d'être envoyé à <strong id="success-email"></strong>.
+          Ouvrez-le sur cet appareil pour entrer dans votre cocon.
+        </p>
+        <p class="login-footnote">Rien reçu ? Vérifiez les spams — ou Supabase → Authentication → Logs.</p>
+      </div>
+
+      <p class="login-footnote" id="login-footnote">
+        Lien valable quelques minutes. Pensez à vérifier les spams.
+      </p>
+    </article>
+
+    <p class="login-back">
+      <a href="/">← Retour à l'accueil</a>
+    </p>
+  </div>
+
+  <script src="/js/login.js" type="module"></script>
+</body>
+</html>

@@ -22,6 +22,7 @@
       </a>
       <nav class="nav">
         <a href="/">Accueil</a>
+        <button class="button button-ghost" id="logout-btn" type="button">Déconnexion</button>
         <a class="button button-secondary" id="booking-link" href="#" target="_blank" rel="noopener">Réserver sur ClicRDV</a>
       </nav>
     </header>
@@ -36,6 +37,16 @@
       Une alerte vous a été envoyée récemment — pensez à regarder votre téléphone.
     </div>
     <div class="notice notice-warn" id="inactive-banner" hidden></div>
+
+    <!-- Étape 2 : retirer hidden sur ce bloc pour pause / reprise veille -->
+    <div class="cocon-controls" id="watch-controls" hidden>
+      <button class="button button-secondary" id="pause-watch" type="button" hidden>
+        Mettre la veille en pause
+      </button>
+      <button class="button button-primary" id="resume-watch" type="button" hidden>
+        Reprendre la veille
+      </button>
+    </div>
 
     <div class="cocon-grid">
       <article class="cocon-card cocon-card-highlight">

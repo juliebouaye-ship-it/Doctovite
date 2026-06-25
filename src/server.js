@@ -125,6 +125,10 @@ cron.schedule(cronExpr, () => {
   console.log(`[${new Date().toISOString()}] Vérification automatique...`);
   runCheck(true)
     .then((result) => {
+      if (result.skipped) {
+        console.log(`[${new Date().toISOString()}] Veille en pause — scan ignoré`);
+        return;
+      }
       console.log(
         `[${new Date().toISOString()}] ${result.slot_count} créneau(x)${
           result.notified ? " — notification envoyée" : ""

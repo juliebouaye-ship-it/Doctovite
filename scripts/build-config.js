@@ -7,6 +7,7 @@ const outPath = path.join(__dirname, "..", "public", "js", "supabase-config.js")
 
 const url = process.env.SUPABASE_URL || "";
 const key = process.env.SUPABASE_ANON_KEY || "";
+const allowedEmail = process.env.ALLOWED_EMAIL || "";
 
 if (!url || !key) {
   console.warn(
@@ -18,6 +19,7 @@ const content = `// Généré automatiquement par scripts/build-config.js — ne
 // Ce fichier est gitignore ; les valeurs viennent des env vars Netlify au build.
 export const SUPABASE_URL = ${JSON.stringify(url)};
 export const SUPABASE_ANON_KEY = ${JSON.stringify(key)};
+export const ALLOWED_EMAIL = ${JSON.stringify(allowedEmail)};
 `;
 
 fs.writeFileSync(outPath, content, "utf8");

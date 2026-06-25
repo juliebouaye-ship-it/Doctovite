@@ -25,6 +25,20 @@ import {
 export async function runCheck(sendNotification = true) {
   const watch = supabaseEnabled() ? await getActiveWatch() : null;
 
+  if (supabaseEnabled() && !watch) {
+    console.log(`[${new Date().toISOString()}] Veille en pause — scan ignoré`);
+    return {
+      ok: true,
+      skipped: true,
+      slot_count: 0,
+      new_slot_count: 0,
+      notified: false,
+      slots: [],
+      new_slots: [],
+      formatted_slots: [],
+    };
+  }
+
   try {
     const slots = await fetchAllSlots();
     const known = watch

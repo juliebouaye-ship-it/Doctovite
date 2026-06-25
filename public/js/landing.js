@@ -37,7 +37,7 @@ function renderCatalog(cabinets) {
             <strong>${cabinet.calendars?.length || 0} praticien(s)</strong>
           </div>
           <div class="hero-actions" style="margin-top:auto;">
-            <a class="button button-primary" href="/dashboard.html">Mon espace</a>
+            <a class="button button-primary" href="/login.html">Mon espace</a>
             ${cabinet.booking_url ? `<a class="button button-secondary" href="${cabinet.booking_url}" target="_blank" rel="noopener">ClicRDV</a>` : ""}
           </div>
         </article>

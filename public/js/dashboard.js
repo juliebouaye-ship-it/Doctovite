@@ -1,15 +1,14 @@
-// Cocon Doctovite — lit l'état depuis Supabase (source unique VPS + Netlify).
-
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "/js/supabase-config.js";
-
-const supabase =
-  SUPABASE_URL && SUPABASE_ANON_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
+import {
+  fetchOwnedWatch,
+  requireAuth,
+  signOut,
+  supabase,
+} from "/js/auth.js";
 
 const isLocalDev =
   location.hostname === "127.0.0.1" || location.hostname === "localhost";
+
+let currentWatch = null;
 
 function formatDate(iso) {
   if (!iso) return "—";
@@ -37,6 +36,10 @@ function setGreeting() {
   document.getElementById("greeting").textContent = `${getGreeting()} 👋`;
 }
 
+function updateWatchControls(_watch) {
+  // Étape 1 : boutons masqués (#watch-controls hidden). Étape 2 : afficher selon statut.
+}
+
 function renderStatus(data) {
   const cabinetName = data.cabinet?.name || "votre cabinet";
   document.getElementById("watch-summary").textContent =
@@ -46,7 +49,7 @@ function renderStatus(data) {
     document.getElementById("booking-link").href = data.cabinet.booking_url;
   }
 
-  const isActive = data.watch_status !== "paused" && data.watch_status !== "completed";
+  const isActive = data.watch_status === "active";
   document.getElementById("watch-status").textContent = isActive
     ? "Veille active"
     : "En pause";
@@ -54,7 +57,7 @@ function renderStatus(data) {
     "cocon-value " + (isActive ? "value-ok" : "value-warn");
   document.getElementById("watch-hint").textContent = isActive
     ? `Vérification automatique toutes les ${data.check_interval_minutes} minutes`
-    : "Pas de surveillance en cours pour le moment.";
+    : "Les scans sont suspendus — le VPS peut encore tourner (voir doc).";
 
   const notifyEl = document.getElementById("notify-type");
   notifyEl.textContent = data.ntfy_configured
@@ -87,8 +90,9 @@ function renderStatus(data) {
 
   const slotsEl = document.getElementById("current-slots");
   if (!latest || latest.slot_count === 0) {
-    slotsEl.innerHTML =
-      '<p class="empty">Aucune place libre pour l\'instant — on continue de surveiller pour vous.</p>';
+    slotsEl.innerHTML = isActive
+      ? '<p class="empty">Aucune place libre pour l\'instant — on continue de surveiller pour vous.</p>'
+      : '<p class="empty">Veille en pause — reprenez quand vous voulez relancer la surveillance.</p>';
   } else {
     slotsEl.innerHTML = latest.slots
       .map((slot) => {
@@ -107,55 +111,32 @@ function renderStatus(data) {
   inactive.hidden = isActive;
   if (!isActive) {
     inactive.textContent =
-      "La veille est en pause. Votre historique reste ici ; les alertes reprendront quand la surveillance sera active.";
+      "La veille est en pause dans votre cocon. Pensez à éteindre le VPS si vous n'en avez plus besoin (voir doc/VEILLE.md).";
   }
+
+  updateWatchControls(currentWatch);
 }
 
-function showEmptyCocon() {
-  document.getElementById("watch-summary").textContent =
-    "Votre espace est prêt. La veille n'est pas encore configurée dans Supabase.";
-
-  document.getElementById("watch-status").textContent = "En attente";
-  document.getElementById("watch-status").className = "cocon-value value-warn";
-  document.getElementById("watch-hint").textContent =
-    "Lancez la migration Supabase pour connecter le VPS à ce cocon.";
-
-  document.getElementById("last-check").textContent = "—";
-  document.getElementById("slot-count").textContent = "—";
-  document.getElementById("notify-type").textContent = "—";
-
-  document.getElementById("inactive-banner").hidden = false;
-  document.getElementById("inactive-banner").textContent =
-    "Pas encore de données Supabase. Le VPS et le cocon ne sont pas encore reliés.";
-
-  document.getElementById("current-slots").innerHTML =
-    '<p class="empty">Les vérifications apparaîtront ici une fois la connexion établie.</p>';
-}
-
-async function loadFromSupabase() {
-  if (!supabase) return null;
-
-  const { data: watch, error: watchError } = await supabase
-    .from("watches")
-    .select("*, cabinets(*)")
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (watchError) throw watchError;
-  if (!watch) return null;
-
-  const { data: checks, error: checksError } = await supabase
+async function loadChecksForWatch(watchId) {
+  const { data, error } = await supabase
     .from("checks")
     .select("checked_at, slot_count, slots, notified, error")
-    .eq("watch_id", watch.id)
+    .eq("watch_id", watchId)
     .order("checked_at", { ascending: false })
     .limit(20);
 
-  if (checksError) throw checksError;
+  if (error) throw error;
+  return data || [];
+}
 
-  const latest = checks?.[0] || null;
+async function loadFromSupabase() {
+  const watch = await fetchOwnedWatch();
+  if (!watch) return null;
+
+  currentWatch = watch;
+  const checks = await loadChecksForWatch(watch.id);
+  const latest = checks[0] || null;
+
   return {
     check_interval_minutes: watch.check_interval_minutes,
     scan_days: watch.scan_days,
@@ -163,7 +144,7 @@ async function loadFromSupabase() {
     watch_status: watch.status,
     cabinet: watch.cabinets,
     latest,
-    history: checks || [],
+    history: checks,
   };
 }
 
@@ -196,8 +177,23 @@ async function refresh() {
       console.error("[cocon] API locale :", error);
     }
   }
+}
 
-  showEmptyCocon();
+async function setWatchStatus(status) {
+  if (!currentWatch) return;
+
+  const payload =
+    status === "active"
+      ? { status: "active", started_at: new Date().toISOString(), ended_at: null }
+      : { status: "paused", ended_at: new Date().toISOString() };
+
+  const { error } = await supabase
+    .from("watches")
+    .update(payload)
+    .eq("id", currentWatch.id);
+
+  if (error) throw error;
+  await refresh();
 }
 
 async function runAction(url, message) {
@@ -236,8 +232,40 @@ async function runDiagnostic() {
   messageEl.textContent = data.summary;
 }
 
-setGreeting();
-refresh();
+async function init() {
+  const session = await requireAuth();
+  if (!session) return;
+
+  setGreeting();
+  await refresh();
+  setInterval(refresh, 60_000);
+}
+
+document.getElementById("logout-btn").addEventListener("click", () => signOut());
+
+document.getElementById("pause-watch").addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try {
+    await setWatchStatus("paused");
+  } catch (error) {
+    alert(error.message || "Impossible de mettre en pause.");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById("resume-watch").addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try {
+    await setWatchStatus("active");
+  } catch (error) {
+    alert(error.message || "Impossible de reprendre la veille.");
+  } finally {
+    button.disabled = false;
+  }
+});
 
 if (isLocalDev) {
   document.getElementById("check-now").addEventListener("click", async (event) => {
@@ -275,4 +303,4 @@ if (isLocalDev) {
   document.getElementById("test-ntfy").disabled = true;
 }
 
-setInterval(refresh, 60_000);
+init();
